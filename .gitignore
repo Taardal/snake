@@ -1,3 +1,11 @@
+### MAC OSX ###
+*.DS_Store
+
+### IntelliJ IDEA ###
+out/
+.idea/
+*.iml
+
 # Compiled class file
 *.class
 
