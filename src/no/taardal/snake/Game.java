@@ -19,6 +19,8 @@ import java.lang.System;
 
 public class Game implements Observer {
 
+    int TEST = 431;
+
     public static final int MAP_SIZE = 5;
 
     private EventManager eventManager;
