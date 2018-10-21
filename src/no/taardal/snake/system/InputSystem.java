@@ -1,7 +1,5 @@
 package no.taardal.snake.system;
 
-import no.taardal.snake.entity.Entity;
-import no.taardal.snake.event.Event;
 import no.taardal.snake.keyboard.Keyboard;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
@@ -28,33 +26,18 @@ public class InputSystem implements System {
     public void update() {
         if (keyboard.isAnyKeyPressed()) {
             if (keyboard.isPressed(KeyEvent.VK_UP)) {
-                eventManager.sendEvent(getEvent(EventType.UP_PRESSED));
+                eventManager.sendEvent(EventType.UP_PRESSED);
             }
             if (keyboard.isPressed(KeyEvent.VK_LEFT)) {
-                eventManager.sendEvent(getEvent(EventType.LEFT_PRESSED));
+                eventManager.sendEvent(EventType.LEFT_PRESSED);
             }
             if (keyboard.isPressed(KeyEvent.VK_RIGHT)) {
-                eventManager.sendEvent(getEvent(EventType.RIGHT_PRESSED));
+                eventManager.sendEvent(EventType.RIGHT_PRESSED);
             }
             if (keyboard.isPressed(KeyEvent.VK_DOWN)) {
-                eventManager.sendEvent(getEvent(EventType.DOWN_PRESSED));
+                eventManager.sendEvent(EventType.DOWN_PRESSED);
             }
         }
-    }
-
-    private Event getEvent(EventType eventType) {
-        return new Event() {
-
-            @Override
-            public EventType getType() {
-                return eventType;
-            }
-
-            @Override
-            public Entity getEntity() {
-                return null;
-            }
-        };
     }
 
 }

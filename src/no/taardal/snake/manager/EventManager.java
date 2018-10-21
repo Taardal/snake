@@ -1,6 +1,6 @@
 package no.taardal.snake.manager;
 
-import no.taardal.snake.event.Event;
+import no.taardal.snake.entity.Entity;
 import no.taardal.snake.observer.Observer;
 import no.taardal.snake.subject.Subject;
 import no.taardal.snake.type.EventType;
@@ -23,9 +23,13 @@ public class EventManager {
         subjects.get(eventType).add(observer);
     }
 
-    public void sendEvent(Event event) {
-        if (subjects.containsKey(event.getType())) {
-            subjects.get(event.getType()).sendEvent(event);
+    public void sendEvent(EventType eventType) {
+        sendEvent(eventType, null);
+    }
+
+    public void sendEvent(EventType eventType, Entity entity) {
+        if (subjects.containsKey(eventType)) {
+            subjects.get(eventType).sendEvent(eventType, entity);
         }
     }
 }

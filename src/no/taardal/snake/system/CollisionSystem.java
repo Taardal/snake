@@ -1,7 +1,6 @@
 package no.taardal.snake.system;
 
 import no.taardal.snake.entity.Entity;
-import no.taardal.snake.event.Event;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
@@ -26,24 +25,24 @@ public class CollisionSystem implements System {
     @Override
     public void update() {
         List<Entity> bodyParts = componentManager.getBodyComponent().getBodyParts();
-        Vector2i headPosition = getPosition(bodyParts.get(0));
-        sendAppleCollisionEvents(headPosition);
-        sendBodyCollisionEvents(headPosition, bodyParts);
+        sendAppleCollisionEvents(bodyParts);
+        sendBodyCollisionEvents(bodyParts);
     }
 
-    private void sendBodyCollisionEvents(Vector2i headPosition, List<Entity> bodyParts) {
+    private void sendBodyCollisionEvents(List<Entity> bodyParts) {
+        Entity firstBodyPart = bodyParts.get(0);
         bodyParts.stream()
-                .filter(entity -> headPosition.equals(getPosition(entity)))
+                .filter(entity -> !entity.equals(firstBodyPart) && getPosition(firstBodyPart).equals(getPosition(entity)))
                 .findFirst()
-                .ifPresent(entity -> eventManager.sendEvent(getEvent(EventType.COLLIDED_WITH_BODY, null)));
+                .ifPresent(entity -> eventManager.sendEvent(EventType.GAME_ENDED));
     }
 
-    private void sendAppleCollisionEvents(Vector2i headPosition) {
+    private void sendAppleCollisionEvents(List<Entity> bodyParts) {
         entityManager.get(EntityType.APPLE).stream()
-                .filter(entity -> headPosition.equals(getPosition(entity)))
+                .filter(entity -> getPosition(bodyParts.get(0)).equals(getPosition(entity)))
                 .findFirst()
                 .ifPresent(entity -> {
-                    eventManager.sendEvent(getEvent(EventType.APPLE_EATEN, entity));
+                    eventManager.sendEvent(EventType.APPLE_EATEN, entity);
                     entityManager.getEntities().remove(entity.getId());
                     componentManager.getPositionComponents().remove(entity.getId());
                 });
@@ -51,21 +50,6 @@ public class CollisionSystem implements System {
 
     private Vector2i getPosition(Entity entity) {
         return componentManager.getPositionComponent(entity.getId()).getPosition();
-    }
-
-    private Event getEvent(EventType eventType, Entity entity) {
-        return new Event() {
-
-            @Override
-            public EventType getType() {
-                return eventType;
-            }
-
-            @Override
-            public Entity getEntity() {
-                return entity;
-            }
-        };
     }
 
 }

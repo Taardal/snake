@@ -1,8 +1,9 @@
 package no.taardal.snake.observer;
 
-import no.taardal.snake.event.Event;
+import no.taardal.snake.entity.Entity;
+import no.taardal.snake.type.EventType;
 
 public interface Observer {
 
-    void onEvent(Event event);
+    void onEvent(EventType eventType, Entity entity);
 }

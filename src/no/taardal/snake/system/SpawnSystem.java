@@ -2,10 +2,11 @@ package no.taardal.snake.system;
 
 import no.taardal.snake.Game;
 import no.taardal.snake.Log;
-import no.taardal.snake.component.*;
+import no.taardal.snake.component.DirectionComponent;
+import no.taardal.snake.component.PositionComponent;
+import no.taardal.snake.component.RouteComponent;
 import no.taardal.snake.direction.Direction;
 import no.taardal.snake.entity.Entity;
-import no.taardal.snake.event.Event;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
@@ -44,18 +45,18 @@ public class SpawnSystem implements System, Observer {
     }
 
     @Override
-    public void onEvent(Event event) {
-        Log.log("Received event " + event.getType() + ", " + event.getEntity());
-        if (event.getType() == EventType.GAME_STARTED) {
+    public void onEvent(EventType eventType, Entity entity) {
+        Log.log("Received event " + eventType + ", " + entity);
+        if (eventType == EventType.GAME_STARTED) {
             for (int i = 0; i < 3; i++) {
                 Vector2i spawnPosition = new Vector2i(0, i + 1);
                 spawnBodyPart(spawnPosition, Direction.UP);
             }
             spawnApple(new Vector2i(2, 2));
         }
-        if (event.getType() == EventType.APPLE_EATEN) {
+        if (eventType == EventType.APPLE_EATEN) {
             spawnBodyPartAtEndOfBody();
-            spawnAppleAtRandomPosition(event);
+            spawnNextApple(entity);
         }
     }
 
@@ -104,8 +105,8 @@ public class SpawnSystem implements System, Observer {
         return new Vector2i(x, y);
     }
 
-    private void spawnAppleAtRandomPosition(Event event) {
-        Vector2i eatenApplePosition = componentManager.getPositionComponent(event.getEntity().getId()).getPosition();
+    private void spawnNextApple(Entity eatenAppleEntity) {
+        Vector2i eatenApplePosition = componentManager.getPositionComponent(eatenAppleEntity.getId()).getPosition();
         IntStream.range(0, MAX_POSSIBLE_SPAWN_LOCATIONS).boxed()
                 .map(i -> new Vector2i(random.nextInt(Game.MAP_SIZE), random.nextInt(Game.MAP_SIZE)))
                 .filter(spawnPosition -> !spawnPosition.equals(eatenApplePosition) && !isBodyPartAtPosition(spawnPosition))

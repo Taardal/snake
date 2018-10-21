@@ -1,7 +1,8 @@
 package no.taardal.snake.subject;
 
-import no.taardal.snake.event.Event;
+import no.taardal.snake.entity.Entity;
 import no.taardal.snake.observer.Observer;
+import no.taardal.snake.type.EventType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,8 @@ public class Subject {
         observers.remove(observer);
     }
 
-    public void sendEvent(Event event) {
-        observers.forEach(observer -> observer.onEvent(event));
+    public void sendEvent(EventType eventType, Entity entity) {
+        observers.forEach(observer -> observer.onEvent(eventType, entity));
     }
 
 }

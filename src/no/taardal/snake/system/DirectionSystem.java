@@ -7,7 +7,6 @@ import no.taardal.snake.component.RouteComponent;
 import no.taardal.snake.direction.Direction;
 import no.taardal.snake.direction.DirectionChange;
 import no.taardal.snake.entity.Entity;
-import no.taardal.snake.event.Event;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
@@ -30,9 +29,9 @@ public class DirectionSystem implements System, Observer {
     }
 
     @Override
-    public void onEvent(Event event) {
-        Log.log("Received event " + event.getType() + ", " + event.getEntity());
-        Direction nextDirection = getNextDirection(event);
+    public void onEvent(EventType eventType, Entity entity) {
+        Log.log("Received event " + eventType + ", " + entity);
+        Direction nextDirection = getNextDirection(eventType);
         if (nextDirection != null) {
             List<Entity> bodyParts = componentManager.getBodyComponent().getBodyParts();
             Vector2i headPosition = componentManager.getPositionComponent(bodyParts.get(0).getId()).getPosition();
@@ -59,17 +58,17 @@ public class DirectionSystem implements System, Observer {
         });
     }
 
-    private Direction getNextDirection(Event event) {
-        if (event.getType() == EventType.UP_PRESSED) {
+    private Direction getNextDirection(EventType eventType) {
+        if (eventType == EventType.UP_PRESSED) {
             return Direction.UP;
         }
-        if (event.getType() == EventType.LEFT_PRESSED) {
+        if (eventType == EventType.LEFT_PRESSED) {
             return Direction.LEFT;
         }
-        if (event.getType() == EventType.RIGHT_PRESSED) {
+        if (eventType == EventType.RIGHT_PRESSED) {
             return Direction.RIGHT;
         }
-        if (event.getType() == EventType.DOWN_PRESSED) {
+        if (eventType == EventType.DOWN_PRESSED) {
             return Direction.DOWN;
         }
         return null;
@@ -92,5 +91,4 @@ public class DirectionSystem implements System, Observer {
     private boolean isVertical(Direction direction) {
         return direction == Direction.UP || direction == Direction.DOWN;
     }
-
 }

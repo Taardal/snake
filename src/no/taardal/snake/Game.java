@@ -4,7 +4,6 @@ import no.taardal.snake.component.DirectionComponent;
 import no.taardal.snake.component.PositionComponent;
 import no.taardal.snake.component.RouteComponent;
 import no.taardal.snake.entity.Entity;
-import no.taardal.snake.event.Event;
 import no.taardal.snake.keyboard.Keyboard;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
@@ -52,11 +51,12 @@ public class Game implements Observer {
     }
 
     @Override
-    public void onEvent(Event event) {
-        if (event.getType() == EventType.APPLE_EATEN) {
+    public void onEvent(EventType eventType, Entity entity) {
+        Log.log("Received event " + eventType + ", " + entity);
+        if (eventType == EventType.APPLE_EATEN) {
             score += 10;
         }
-        if (event.getType() == EventType.COLLIDED_WITH_BODY) {
+        if (eventType == EventType.GAME_ENDED) {
             Log.log("GAME OVER! Score: " + score);
         }
     }
@@ -68,10 +68,9 @@ public class Game implements Observer {
         eventManager.addObserver(systemManager.getDirectionSystem(), EventType.DOWN_PRESSED);
         eventManager.addObserver(systemManager.getSpawnSystem(), EventType.GAME_STARTED);
         eventManager.addObserver(systemManager.getSpawnSystem(), EventType.APPLE_EATEN);
-
-        eventManager.sendEvent(getEvent(EventType.GAME_STARTED));
-
-        logInit();
+        eventManager.addObserver(this, EventType.APPLE_EATEN);
+        eventManager.addObserver(this, EventType.GAME_ENDED);
+        eventManager.sendEvent(EventType.GAME_STARTED);
     }
 
     private void run() {
@@ -123,38 +122,4 @@ public class Game implements Observer {
         Log.logBreak();
     }
 
-    private void logInit() {
-        Log.log("ENTITIES");
-        Log.logLine();
-        Log.log(entityManager.getEntities().values().toString());
-        Log.logBreak();
-        Log.log("COMPONENTS");
-        Log.logLine();
-        Log.log(componentManager.getDirectionComponents().values().toString());
-        Log.log(componentManager.getPositionComponents().values().toString());
-        Log.log(componentManager.getIndexComponents().values().toString());
-        Log.logBreak();
-        Log.log("SYSTEMS");
-        Log.logLine();
-        Log.log(systemManager.toString());
-        Log.logBreak();
-    }
-
-    private Event getEvent(EventType eventType) {
-        return getEvent(eventType, null);
-    }
-
-    private Event getEvent(EventType eventType, Entity entity) {
-        return new Event() {
-            @Override
-            public EventType getType() {
-                return eventType;
-            }
-
-            @Override
-            public Entity getEntity() {
-                return entity;
-            }
-        };
-    }
 }
