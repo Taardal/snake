@@ -1,19 +1,23 @@
 package no.taardal.snake;
 
-import no.taardal.snake.event.GameStartedEvent;
+import no.taardal.snake.component.PositionComponent;
+import no.taardal.snake.entity.Entity;
+import no.taardal.snake.event.Event;
 import no.taardal.snake.keyboard.Keyboard;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
 import no.taardal.snake.manager.SystemManager;
-import no.taardal.snake.system.InputSystem;
-import no.taardal.snake.system.MovementSystem;
-import no.taardal.snake.system.SpawnSystem;
+import no.taardal.snake.system.*;
+import no.taardal.snake.type.EntityType;
 import no.taardal.snake.type.EventType;
 
 import java.awt.event.KeyEvent;
+import java.lang.System;
 
 public class Game {
+
+    public static final int MAP_SIZE = 5;
 
     private EventManager eventManager;
     private EntityManager entityManager;
@@ -27,11 +31,15 @@ public class Game {
         componentManager = new ComponentManager();
 
         keyboard = new Keyboard();
-        InputSystem inputSystem = new InputSystem(keyboard, eventManager);
+
+        InputSystem inputSystem = new InputSystem(entityManager, componentManager, eventManager, keyboard);
+        DirectionSystem directionSystem = new DirectionSystem(entityManager, componentManager, eventManager);
         MovementSystem movementSystem = new MovementSystem(entityManager, componentManager, eventManager);
+        CollisionSystem collisionSystem = new CollisionSystem(entityManager, componentManager, eventManager);
+        ScoreSystem scoreSystem = new ScoreSystem(entityManager, componentManager, eventManager);
         SpawnSystem spawnSystem = new SpawnSystem(entityManager, componentManager, eventManager);
 
-        systemManager = new SystemManager(inputSystem, movementSystem, spawnSystem);
+        systemManager = new SystemManager(inputSystem, directionSystem, movementSystem, collisionSystem, scoreSystem, spawnSystem);
     }
 
     public static void main(String[] args) {
@@ -41,20 +49,56 @@ public class Game {
     }
 
     private void init() {
-        eventManager.addObserver(systemManager.getMovementSystem(), EventType.DIRECTION_KEY_PRESSED);
+        eventManager.addObserver(systemManager.getDirectionSystem(), EventType.UP_PRESSED);
+        eventManager.addObserver(systemManager.getDirectionSystem(), EventType.LEFT_PRESSED);
+        eventManager.addObserver(systemManager.getDirectionSystem(), EventType.RIGHT_PRESSED);
+        eventManager.addObserver(systemManager.getDirectionSystem(), EventType.DOWN_PRESSED);
+        eventManager.addObserver(systemManager.getMovementSystem(), EventType.COLLIDED_WITH_MAP);
+        eventManager.addObserver(systemManager.getScoreSystem(), EventType.APPLE_EATEN);
         eventManager.addObserver(systemManager.getSpawnSystem(), EventType.GAME_STARTED);
         eventManager.addObserver(systemManager.getSpawnSystem(), EventType.APPLE_EATEN);
 
-        eventManager.sendEvent(new GameStartedEvent());
+        eventManager.sendEvent(getEvent(EventType.GAME_STARTED));
+
         logInit();
     }
 
     private void run() {
-        systemManager.getInputSystem().update();
-        systemManager.getMovementSystem().update();
+        logMap();
+
+        updateSystems();
+
+        logMap();
+
         keyboard.press(KeyEvent.VK_RIGHT);
+        updateSystems();
+        keyboard.release();
+
+        logMap();
+/*
+        updateSystems();
+
+        logMap();
+
+        keyboard.press(KeyEvent.VK_DOWN);
+        updateSystems();
+        keyboard.release();
+
+        logMap();
+
+        updateSystems();
+
+        logMap();
+*/
+    }
+
+    private void updateSystems() {
         systemManager.getInputSystem().update();
         systemManager.getMovementSystem().update();
+        systemManager.getDirectionSystem().update();
+        systemManager.getCollisionSystem().update();
+        systemManager.getScoreSystem().update();
+        systemManager.getSpawnSystem().update();
     }
 
     private void logInit() {
@@ -72,6 +116,43 @@ public class Game {
         Log.logLine();
         Log.log(systemManager.toString());
         Log.logBreak();
+    }
+
+    private void logMap() {
+        int[][] map = new int[MAP_SIZE][MAP_SIZE];
+        entityManager.get(EntityType.APPLE).forEach(entity -> {
+            PositionComponent positionComponent = componentManager.getPositionComponent(entity.getId());
+            map[positionComponent.getY()][positionComponent.getX()] = 2;
+        });
+        entityManager.get(EntityType.BODY_PART).forEach(entity -> {
+            PositionComponent positionComponent = componentManager.getPositionComponent(entity.getId());
+            map[positionComponent.getY()][positionComponent.getX()] = 1;
+        });
+        for (int[] row : map) {
+            for (int x : row) {
+                System.out.print(x + "\t");
+            }
+            System.out.println();
+        }
+        Log.logBreak();
+    }
+
+    private Event getEvent(EventType eventType) {
+        return getEvent(eventType, null);
+    }
+
+    private Event getEvent(EventType eventType, Entity entity) {
+        return new Event() {
+            @Override
+            public EventType getType() {
+                return eventType;
+            }
+
+            @Override
+            public Entity getEntity() {
+                return entity;
+            }
+        };
     }
 
 }

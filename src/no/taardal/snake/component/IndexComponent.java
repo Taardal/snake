@@ -12,10 +12,6 @@ public class IndexComponent implements Comparable<IndexComponent> {
         return index;
     }
 
-    public boolean isHead() {
-        return index == 0;
-    }
-
     @Override
     public String toString() {
         return "IndexComponent{" +

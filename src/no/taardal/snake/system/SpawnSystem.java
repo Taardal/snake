@@ -1,11 +1,12 @@
 package no.taardal.snake.system;
 
+import no.taardal.snake.Game;
+import no.taardal.snake.Log;
 import no.taardal.snake.component.DirectionComponent;
 import no.taardal.snake.component.IndexComponent;
 import no.taardal.snake.component.PositionComponent;
 import no.taardal.snake.direction.Direction;
 import no.taardal.snake.entity.Entity;
-import no.taardal.snake.event.AppleEatenEvent;
 import no.taardal.snake.event.Event;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
@@ -40,42 +41,38 @@ public class SpawnSystem implements System, Observer {
     @Override
     public void onEvent(Event event) {
         if (event.getType() == EventType.GAME_STARTED) {
-            spawnBodyParts();
-            spawnApple();
+            for (int i = 0; i < 3; i++) {
+                Vector2i spawnPosition = new Vector2i(0, i + 1);
+                Entity entity = new Entity(getId(), EntityType.BODY_PART);
+                entityManager.add(entity);
+                componentManager.add(entity.getId(), new DirectionComponent(Direction.UP));
+                componentManager.add(entity.getId(), new PositionComponent(spawnPosition));
+                componentManager.add(entity.getId(), new IndexComponent(i));
+            }
+            spawnApple(new Vector2i(2, 2));
         }
         if (event.getType() == EventType.APPLE_EATEN) {
-            AppleEatenEvent appleEatenEvent = (AppleEatenEvent) event;
-
-            Entity eatenApple = entityManager.get(appleEatenEvent.getEntityId());
-            PositionComponent positionComponent = componentManager.getPositionComponent(appleEatenEvent.getEntityId());
-
-            int x = random.nextInt(3);
-            int y = random.nextInt(3);
-            if (x != positionComponent.getX() || y != positionComponent.getY()) {
-                Entity appleToBeSpawned = new Entity(getId(), EntityType.APPLE);
-                entityManager.add(appleToBeSpawned);
-                componentManager.add(appleToBeSpawned.getId(), new PositionComponent(new Vector2i(x, y)));
+            Vector2i eatenApplePosition = componentManager.getPositionComponent(event.getEntity().getId()).getPosition();
+            Vector2i appleSpawnPosition = new Vector2i(random.nextInt(Game.MAP_SIZE), random.nextInt(Game.MAP_SIZE));
+            if (!appleSpawnPosition.equals(eatenApplePosition) && !isBodyPartOnPosition(appleSpawnPosition)) {
+                spawnApple(appleSpawnPosition);
             } else {
-                x = random.nextInt(3);
-                y = random.nextInt(3);
+                Log.log("Could not spawn apple at position " + appleSpawnPosition.toString());
             }
         }
     }
 
-    private void spawnBodyParts() {
-        for (int i = 0; i < 3; i++) {
-            Entity bodyPartEntity = new Entity(getId(), EntityType.BODY_PART);
-            entityManager.add(bodyPartEntity);
-            componentManager.add(bodyPartEntity.getId(), new PositionComponent(new Vector2i(0, i)));
-            componentManager.add(bodyPartEntity.getId(), new DirectionComponent(Direction.UP));
-            componentManager.add(bodyPartEntity.getId(), new IndexComponent(i));
-        }
+    private void spawnApple(Vector2i position) {
+        Entity entity = new Entity(getId(), EntityType.APPLE);
+        entityManager.add(entity);
+        componentManager.add(entity.getId(), new PositionComponent(position));
     }
 
-    private void spawnApple() {
-        Entity appleEntity = new Entity(getId(), EntityType.APPLE);
-        entityManager.add(appleEntity);
-        componentManager.add(appleEntity.getId(), new PositionComponent(new Vector2i(2, 2)));
+    private boolean isBodyPartOnPosition(Vector2i position) {
+        return entityManager.get(EntityType.BODY_PART).stream().anyMatch(bodyPartEntity -> {
+            PositionComponent positionComponent1 = componentManager.getPositionComponent(bodyPartEntity.getId());
+            return positionComponent1.getPosition().equals(position);
+        });
     }
 
     private String getId() {

@@ -1,5 +1,7 @@
 package no.taardal.snake.vector;
 
+import java.util.Objects;
+
 public class Vector2i {
 
     private int x;
@@ -130,4 +132,25 @@ public class Vector2i {
         return new Vector2i(x, y);
     }
 
+    @Override
+    public String toString() {
+        return "Vector2i{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vector2i vector2i = (Vector2i) o;
+        return x == vector2i.x &&
+                y == vector2i.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
 }

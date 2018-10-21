@@ -19,6 +19,10 @@ public class Keyboard {
     }
 
     public void release() {
-        keyCode = 0;
+        keyCode = NO_KEY_PRESSED;
+    }
+
+    public boolean isAnyKeyPressed() {
+        return keyCode != NO_KEY_PRESSED;
     }
 }
