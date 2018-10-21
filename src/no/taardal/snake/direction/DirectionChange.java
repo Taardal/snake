@@ -19,4 +19,12 @@ public class DirectionChange {
     public Vector2i getPosition() {
         return position;
     }
+
+    @Override
+    public String toString() {
+        return "DirectionChange{" +
+                "direction=" + direction +
+                ", position=" + position +
+                '}';
+    }
 }

@@ -1,9 +1,6 @@
 package no.taardal.snake.manager;
 
-import no.taardal.snake.component.DirectionComponent;
-import no.taardal.snake.component.IndexComponent;
-import no.taardal.snake.component.PositionComponent;
-import no.taardal.snake.component.RouteComponent;
+import no.taardal.snake.component.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,14 +9,14 @@ public class ComponentManager {
 
     private Map<String, PositionComponent> positionComponents;
     private Map<String, DirectionComponent> directionComponents;
-    private Map<String, IndexComponent> indexComponents;
     private Map<String, RouteComponent> routeComponents;
+    private BodyComponent bodyComponent;
 
     public ComponentManager() {
         positionComponents = new HashMap<>();
         directionComponents = new HashMap<>();
-        indexComponents = new HashMap<>();
         routeComponents = new HashMap<>();
+        bodyComponent = new BodyComponent();
     }
 
     public Map<String, PositionComponent> getPositionComponents() {
@@ -30,8 +27,12 @@ public class ComponentManager {
         return directionComponents;
     }
 
-    public Map<String, IndexComponent> getIndexComponents() {
-        return indexComponents;
+    public Map<String, RouteComponent> getRouteComponents() {
+        return routeComponents;
+    }
+
+    public BodyComponent getBodyComponent() {
+        return bodyComponent;
     }
 
     public PositionComponent getPositionComponent(String entityId) {
@@ -48,14 +49,6 @@ public class ComponentManager {
 
     public void add(String entityId, DirectionComponent directionComponent) {
         directionComponents.put(entityId, directionComponent);
-    }
-
-    public IndexComponent getIndexComponent(String entityId) {
-        return indexComponents.get(entityId);
-    }
-
-    public void add(String entityId, IndexComponent indexComponent) {
-        indexComponents.put(entityId, indexComponent);
     }
 
     public RouteComponent getRouteComponent(String entityId) {

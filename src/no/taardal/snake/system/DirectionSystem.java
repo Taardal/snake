@@ -1,19 +1,21 @@
 package no.taardal.snake.system;
 
+import no.taardal.snake.Log;
 import no.taardal.snake.component.DirectionComponent;
-import no.taardal.snake.component.IndexComponent;
+import no.taardal.snake.component.PositionComponent;
+import no.taardal.snake.component.RouteComponent;
 import no.taardal.snake.direction.Direction;
+import no.taardal.snake.direction.DirectionChange;
 import no.taardal.snake.entity.Entity;
 import no.taardal.snake.event.Event;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
 import no.taardal.snake.observer.Observer;
-import no.taardal.snake.type.EntityType;
 import no.taardal.snake.type.EventType;
+import no.taardal.snake.vector.Vector2i;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DirectionSystem implements System, Observer {
 
@@ -28,32 +30,33 @@ public class DirectionSystem implements System, Observer {
     }
 
     @Override
-    public void update() {
-        Direction nextBodyPartDirection = null;
-        for (Entity bodyPartEntity : getBodyPartsSortedByIndex()) {
-            IndexComponent indexComponent = componentManager.getIndexComponent(bodyPartEntity.getId());
-            DirectionComponent directionComponent = componentManager.getDirectionComponents().get(bodyPartEntity.getId());
-
-            if (nextBodyPartDirection != null && isValidDirectionChange(nextBodyPartDirection, directionComponent.getDirection())) {
-                directionComponent.setDirection(nextBodyPartDirection);
-            }
-            nextBodyPartDirection = directionComponent.getDirection();
+    public void onEvent(Event event) {
+        Log.log("Received event " + event.getType() + ", " + event.getEntity());
+        Direction nextDirection = getNextDirection(event);
+        if (nextDirection != null) {
+            List<Entity> bodyParts = componentManager.getBodyComponent().getBodyParts();
+            Vector2i headPosition = componentManager.getPositionComponent(bodyParts.get(0).getId()).getPosition();
+            Vector2i directionChangePosition = new Vector2i(headPosition.getX(), headPosition.getY());
+            bodyParts.forEach(bodyPart -> {
+                DirectionChange directionChange = new DirectionChange(nextDirection, directionChangePosition);
+                componentManager.getRouteComponent(bodyPart.getId()).addDirectionChange(directionChange);
+            });
         }
     }
 
     @Override
-    public void onEvent(Event event) {
-        Direction nextDirection = getNextDirection(event);
-        if (nextDirection != null) {
-            Entity entity = event.getEntity() != null ? event.getEntity() : getFirstBodyPart();
-            if (entity != null) {
-                IndexComponent indexComponent = componentManager.getIndexComponent(entity.getId());
-                DirectionComponent directionComponent = componentManager.getDirectionComponent(entity.getId());
-                if (isValidDirectionChange(nextDirection, directionComponent.getDirection())) {
-                    directionComponent.setDirection(nextDirection);
-                }
-            }
-        }
+    public void update() {
+        componentManager.getBodyComponent().getBodyParts().forEach(entity -> {
+            DirectionComponent directionComponent = componentManager.getDirectionComponent(entity.getId());
+            PositionComponent positionComponent = componentManager.getPositionComponent(entity.getId());
+            RouteComponent routeComponent = componentManager.getRouteComponent(entity.getId());
+            routeComponent.getDirectionChanges().stream()
+                    .filter(directionChange -> shouldChangeDirection(directionChange, directionComponent, positionComponent))
+                    .forEach(directionChange -> {
+                        directionComponent.setDirection(directionChange.getDirection());
+                        routeComponent.removeFirst();
+                    });
+        });
     }
 
     private Direction getNextDirection(Event event) {
@@ -72,14 +75,10 @@ public class DirectionSystem implements System, Observer {
         return null;
     }
 
-    private List<Entity> getBodyPartsSortedByIndex() {
-        return entityManager.get(EntityType.BODY_PART).stream().sorted(this::compareBodyPartIndex).collect(Collectors.toList());
-    }
-
-    private int compareBodyPartIndex(Entity entity1, Entity entity2) {
-        IndexComponent indexComponent1 = componentManager.getIndexComponent(entity1.getId());
-        IndexComponent indexComponent2 = componentManager.getIndexComponent(entity2.getId());
-        return indexComponent1.compareTo(indexComponent2);
+    private boolean shouldChangeDirection(DirectionChange directionChange, DirectionComponent directionComponent, PositionComponent positionComponent) {
+        boolean positionsEquals = directionChange.getPosition().equals(positionComponent.getPosition());
+        boolean validDirectionChange = isValidDirectionChange(directionChange.getDirection(), directionComponent.getDirection());
+        return positionsEquals && validDirectionChange;
     }
 
     private boolean isValidDirectionChange(Direction newDirection, Direction currentDirection) {
@@ -92,10 +91,6 @@ public class DirectionSystem implements System, Observer {
 
     private boolean isVertical(Direction direction) {
         return direction == Direction.UP || direction == Direction.DOWN;
-    }
-
-    private Entity getFirstBodyPart() {
-        return entityManager.get(EntityType.BODY_PART).stream().min(this::compareBodyPartIndex).orElse(null);
     }
 
 }

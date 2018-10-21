@@ -1,12 +1,17 @@
 package no.taardal.snake.system;
 
+import no.taardal.snake.entity.Entity;
 import no.taardal.snake.event.Event;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
-import no.taardal.snake.observer.Observer;
+import no.taardal.snake.type.EntityType;
+import no.taardal.snake.type.EventType;
+import no.taardal.snake.vector.Vector2i;
 
-public class CollisionSystem implements System, Observer {
+import java.util.List;
+
+public class CollisionSystem implements System {
 
     private final EntityManager entityManager;
     private final ComponentManager componentManager;
@@ -20,11 +25,47 @@ public class CollisionSystem implements System, Observer {
 
     @Override
     public void update() {
-
+        List<Entity> bodyParts = componentManager.getBodyComponent().getBodyParts();
+        Vector2i headPosition = getPosition(bodyParts.get(0));
+        sendAppleCollisionEvents(headPosition);
+        sendBodyCollisionEvents(headPosition, bodyParts);
     }
 
-    @Override
-    public void onEvent(Event event) {
-
+    private void sendBodyCollisionEvents(Vector2i headPosition, List<Entity> bodyParts) {
+        bodyParts.stream()
+                .filter(entity -> headPosition.equals(getPosition(entity)))
+                .findFirst()
+                .ifPresent(entity -> eventManager.sendEvent(getEvent(EventType.COLLIDED_WITH_BODY, null)));
     }
+
+    private void sendAppleCollisionEvents(Vector2i headPosition) {
+        entityManager.get(EntityType.APPLE).stream()
+                .filter(entity -> headPosition.equals(getPosition(entity)))
+                .findFirst()
+                .ifPresent(entity -> {
+                    eventManager.sendEvent(getEvent(EventType.APPLE_EATEN, entity));
+                    entityManager.getEntities().remove(entity.getId());
+                    componentManager.getPositionComponents().remove(entity.getId());
+                });
+    }
+
+    private Vector2i getPosition(Entity entity) {
+        return componentManager.getPositionComponent(entity.getId()).getPosition();
+    }
+
+    private Event getEvent(EventType eventType, Entity entity) {
+        return new Event() {
+
+            @Override
+            public EventType getType() {
+                return eventType;
+            }
+
+            @Override
+            public Entity getEntity() {
+                return entity;
+            }
+        };
+    }
+
 }
