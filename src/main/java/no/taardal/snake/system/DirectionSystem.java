@@ -7,7 +7,6 @@ import no.taardal.snake.direction.Direction;
 import no.taardal.snake.direction.DirectionChange;
 import no.taardal.snake.entity.Entity;
 import no.taardal.snake.manager.ComponentManager;
-import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
 import no.taardal.snake.observer.Observer;
 import no.taardal.snake.type.EventType;
@@ -21,14 +20,14 @@ public class DirectionSystem implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectionSystem.class);
     
-    private final EntityManager entityManager;
     private final ComponentManager componentManager;
-    private final EventManager eventManager;
 
-    public DirectionSystem(EntityManager entityManager, ComponentManager componentManager, EventManager eventManager) {
-        this.entityManager = entityManager;
+    public DirectionSystem(ComponentManager componentManager, EventManager eventManager) {
         this.componentManager = componentManager;
-        this.eventManager = eventManager;
+        eventManager.addObserver(this, EventType.UP_PRESSED);
+        eventManager.addObserver(this, EventType.LEFT_PRESSED);
+        eventManager.addObserver(this, EventType.RIGHT_PRESSED);
+        eventManager.addObserver(this, EventType.DOWN_PRESSED);
     }
 
     @Override

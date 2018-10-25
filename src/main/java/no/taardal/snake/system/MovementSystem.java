@@ -5,26 +5,32 @@ import no.taardal.snake.component.DirectionComponent;
 import no.taardal.snake.component.PositionComponent;
 import no.taardal.snake.direction.Direction;
 import no.taardal.snake.manager.ComponentManager;
-import no.taardal.snake.manager.EntityManager;
-import no.taardal.snake.manager.EventManager;
 import no.taardal.snake.vector.Vector2i;
 
 public class MovementSystem {
 
-    private final EntityManager entityManager;
-    private final ComponentManager componentManager;
-    private final EventManager eventManager;
+    private static final long MILLIS_BETWEEN_MOVEMENT = 100;
 
-    public MovementSystem(EntityManager entityManager, ComponentManager componentManager, EventManager eventManager) {
-        this.entityManager = entityManager;
+    private final ComponentManager componentManager;
+
+    private long lastTimeMillis;
+
+    public MovementSystem(ComponentManager componentManager) {
         this.componentManager = componentManager;
-        this.eventManager = eventManager;
     }
 
     public void update() {
-        componentManager.getBodyComponent().getBodyParts().forEach(bodyPartEntity -> {
-            DirectionComponent directionComponent = componentManager.getDirectionComponents().get(bodyPartEntity.getId());
-            PositionComponent positionComponent = componentManager.getPositionComponents().get(bodyPartEntity.getId());
+        long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis - lastTimeMillis >= MILLIS_BETWEEN_MOVEMENT) {
+            lastTimeMillis = currentTimeMillis;
+            moveBodyParts();
+        }
+    }
+
+    private void moveBodyParts() {
+        componentManager.getBodyComponent().getBodyParts().forEach(entity -> {
+            DirectionComponent directionComponent = componentManager.getDirectionComponents().get(entity.getId());
+            PositionComponent positionComponent = componentManager.getPositionComponents().get(entity.getId());
             setNextPosition(directionComponent.getDirection(), positionComponent.getPosition());
         });
     }
@@ -38,14 +44,14 @@ public class MovementSystem {
         if (direction == Direction.LEFT) {
             int x = position.getX() - 1;
             if (x < 0) {
-                x = x + Game.MAP_SIZE;
+                x = Game.MAP_SIZE - 1;
             }
             position.setX(x);
         }
         if (direction == Direction.RIGHT) {
             int x = position.getX() + 1;
-            if (x > Game.MAP_SIZE) {
-                x = x - Game.MAP_SIZE;
+            if (x >= Game.MAP_SIZE) {
+                x = 0;
             }
             position.setX(x);
         }
@@ -55,14 +61,14 @@ public class MovementSystem {
         if (direction == Direction.UP) {
             int y = position.getY() - 1;
             if (y < 0) {
-                y = y + Game.MAP_SIZE;
+                y = Game.MAP_SIZE - 1;
             }
             position.setY(y);
         }
         if (direction == Direction.DOWN) {
             int y = position.getY() + 1;
-            if (y > Game.MAP_SIZE) {
-                y = y - Game.MAP_SIZE;
+            if (y >= Game.MAP_SIZE) {
+                y = 0;
             }
             position.setY(y);
         }

@@ -1,5 +1,6 @@
 package no.taardal.snake.manager;
 
+import no.taardal.snake.camera.Camera;
 import no.taardal.snake.system.*;
 
 public class SystemManager {
@@ -11,14 +12,15 @@ public class SystemManager {
     private final SpawnSystem spawnSystem;
     private final DrawingSystem drawingSystem;
 
-    public SystemManager(InputSystem inputSystem, DirectionSystem directionSystem, MovementSystem movementSystem, CollisionSystem collisionSystem, SpawnSystem spawnSystem, DrawingSystem drawingSystem) {
-        this.inputSystem = inputSystem;
-        this.directionSystem = directionSystem;
-        this.movementSystem = movementSystem;
-        this.collisionSystem = collisionSystem;
-        this.spawnSystem = spawnSystem;
-        this.drawingSystem = drawingSystem;
+    public SystemManager(EntityManager entityManager, ComponentManager componentManager, EventManager eventManager) {
+        spawnSystem = new SpawnSystem(entityManager, componentManager, eventManager);
+        inputSystem = new InputSystem(eventManager);
+        movementSystem = new MovementSystem(componentManager);
+        directionSystem = new DirectionSystem(componentManager, eventManager);
+        collisionSystem = new CollisionSystem(entityManager, componentManager, eventManager);
+        drawingSystem = new DrawingSystem(entityManager, componentManager, eventManager);
     }
+
 
     public InputSystem getInputSystem() {
         return inputSystem;
@@ -44,4 +46,13 @@ public class SystemManager {
         return drawingSystem;
     }
 
+    public void update() {
+        directionSystem.update();
+        movementSystem.update();
+        collisionSystem.update();
+    }
+
+    public void draw(Camera camera) {
+        drawingSystem.draw(camera);
+    }
 }

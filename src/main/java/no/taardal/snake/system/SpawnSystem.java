@@ -6,6 +6,7 @@ import no.taardal.snake.component.PositionComponent;
 import no.taardal.snake.component.RouteComponent;
 import no.taardal.snake.component.SpriteComponent;
 import no.taardal.snake.direction.Direction;
+import no.taardal.snake.direction.DirectionChange;
 import no.taardal.snake.entity.Entity;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
@@ -19,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -30,19 +33,15 @@ public class SpawnSystem implements Observer {
 
     private final EntityManager entityManager;
     private final ComponentManager componentManager;
-    private final EventManager eventManager;
 
     private Random random;
 
     public SpawnSystem(EntityManager entityManager, ComponentManager componentManager, EventManager eventManager) {
         this.entityManager = entityManager;
         this.componentManager = componentManager;
-        this.eventManager = eventManager;
+        eventManager.addObserver(this, EventType.GAME_STARTED);
+        eventManager.addObserver(this, EventType.APPLE_EATEN);
         random = new Random();
-    }
-
-    public void update() {
-
     }
 
     @Override
@@ -51,7 +50,7 @@ public class SpawnSystem implements Observer {
         if (eventType == EventType.GAME_STARTED) {
             for (int i = 0; i < 3; i++) {
                 Vector2i spawnPosition = new Vector2i(0, 10 + i);
-                spawnBodyPart(spawnPosition, Direction.UP);
+                spawnBodyPart(spawnPosition, Direction.UP, new ArrayDeque<>());
             }
             spawnApple(new Vector2i(2, 2));
         }
@@ -61,14 +60,14 @@ public class SpawnSystem implements Observer {
         }
     }
 
-    private void spawnBodyPart(Vector2i spawnPosition, Direction direction) {
+    private void spawnBodyPart(Vector2i spawnPosition, Direction direction, Deque<DirectionChange> directionChanges) {
         Entity entity = new Entity(getId(), EntityType.BODY_PART);
         entityManager.add(entity);
+        componentManager.getBodyComponent().addBodyPart(entity);
         componentManager.add(entity.getId(), new DirectionComponent(direction));
         componentManager.add(entity.getId(), new PositionComponent(spawnPosition));
-        componentManager.add(entity.getId(), new RouteComponent());
+        componentManager.add(entity.getId(), new RouteComponent(new ArrayDeque<>(directionChanges)));
         componentManager.add(entity.getId(), new SpriteComponent(new Circle(Game.CELL_SIZE), Color.GREEN));
-        componentManager.getBodyComponent().addBodyPart(entity);
     }
 
     private String getId() {
@@ -86,18 +85,19 @@ public class SpawnSystem implements Observer {
         Entity lastBodyPartEntity = componentManager.getBodyComponent().getLastBodyPart();
         Direction lastBodyPartDirection = componentManager.getDirectionComponent(lastBodyPartEntity.getId()).getDirection();
         Vector2i lastBodyPartPosition = componentManager.getPositionComponent(lastBodyPartEntity.getId()).getPosition();
+        Deque<DirectionChange> directionChanges = componentManager.getRouteComponent(lastBodyPartEntity.getId()).getDirectionChanges();
         Vector2i bodyPartSpawnPosition = getSpawnPositionAtEndOfBody(lastBodyPartPosition, lastBodyPartDirection);
-        spawnBodyPart(bodyPartSpawnPosition, lastBodyPartDirection);
+        spawnBodyPart(bodyPartSpawnPosition, lastBodyPartDirection, directionChanges);
     }
 
     private Vector2i getSpawnPositionAtEndOfBody(Vector2i lastBodyPartPosition, Direction lastBodyPartDirection) {
         int x = lastBodyPartPosition.getX();
         int y = lastBodyPartPosition.getY();
         if (lastBodyPartDirection == Direction.UP) {
-            y--;
+            y++;
         }
         if (lastBodyPartDirection == Direction.DOWN) {
-            y++;
+            y--;
         }
         if (lastBodyPartDirection == Direction.LEFT) {
             x++;

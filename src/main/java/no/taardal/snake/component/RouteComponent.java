@@ -13,6 +13,10 @@ public class RouteComponent {
         this.directionChanges = new ArrayDeque<>();
     }
 
+    public RouteComponent(Deque<DirectionChange> directionChanges) {
+        this.directionChanges = directionChanges;
+    }
+
     public Deque<DirectionChange> getDirectionChanges() {
         return directionChanges;
     }
