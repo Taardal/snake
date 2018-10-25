@@ -10,7 +10,7 @@ import no.taardal.snake.vector.Vector2i;
 
 import java.util.List;
 
-public class CollisionSystem implements System {
+public class CollisionSystem {
 
     private final EntityManager entityManager;
     private final ComponentManager componentManager;
@@ -22,7 +22,6 @@ public class CollisionSystem implements System {
         this.eventManager = eventManager;
     }
 
-    @Override
     public void update() {
         List<Entity> bodyParts = componentManager.getBodyComponent().getBodyParts();
         sendAppleCollisionEvents(bodyParts);

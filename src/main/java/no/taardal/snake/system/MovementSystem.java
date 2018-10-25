@@ -9,7 +9,7 @@ import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
 import no.taardal.snake.vector.Vector2i;
 
-public class MovementSystem implements System {
+public class MovementSystem {
 
     private final EntityManager entityManager;
     private final ComponentManager componentManager;
@@ -21,7 +21,6 @@ public class MovementSystem implements System {
         this.eventManager = eventManager;
     }
 
-    @Override
     public void update() {
         componentManager.getBodyComponent().getBodyParts().forEach(bodyPartEntity -> {
             DirectionComponent directionComponent = componentManager.getDirectionComponents().get(bodyPartEntity.getId());

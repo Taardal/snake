@@ -9,13 +9,15 @@ public class SystemManager {
     private final MovementSystem movementSystem;
     private final CollisionSystem collisionSystem;
     private final SpawnSystem spawnSystem;
+    private final DrawingSystem drawingSystem;
 
-    public SystemManager(InputSystem inputSystem, DirectionSystem directionSystem, MovementSystem movementSystem, CollisionSystem collisionSystem, SpawnSystem spawnSystem) {
+    public SystemManager(InputSystem inputSystem, DirectionSystem directionSystem, MovementSystem movementSystem, CollisionSystem collisionSystem, SpawnSystem spawnSystem, DrawingSystem drawingSystem) {
         this.inputSystem = inputSystem;
         this.directionSystem = directionSystem;
         this.movementSystem = movementSystem;
         this.collisionSystem = collisionSystem;
         this.spawnSystem = spawnSystem;
+        this.drawingSystem = drawingSystem;
     }
 
     public InputSystem getInputSystem() {
@@ -38,14 +40,8 @@ public class SystemManager {
         return spawnSystem;
     }
 
-    @Override
-    public String toString() {
-        return "SystemManager{" +
-                "inputSystem=" + inputSystem +
-                ", directionSystem=" + directionSystem +
-                ", movementSystem=" + movementSystem +
-                ", collisionSystem=" + collisionSystem +
-                ", spawnSystem=" + spawnSystem +
-                '}';
+    public DrawingSystem getDrawingSystem() {
+        return drawingSystem;
     }
+
 }

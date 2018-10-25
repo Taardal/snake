@@ -1,6 +1,5 @@
 package no.taardal.snake.system;
 
-import no.taardal.snake.Log;
 import no.taardal.snake.component.DirectionComponent;
 import no.taardal.snake.component.PositionComponent;
 import no.taardal.snake.component.RouteComponent;
@@ -13,11 +12,15 @@ import no.taardal.snake.manager.EventManager;
 import no.taardal.snake.observer.Observer;
 import no.taardal.snake.type.EventType;
 import no.taardal.snake.vector.Vector2i;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class DirectionSystem implements System, Observer {
+public class DirectionSystem implements Observer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectionSystem.class);
+    
     private final EntityManager entityManager;
     private final ComponentManager componentManager;
     private final EventManager eventManager;
@@ -30,7 +33,7 @@ public class DirectionSystem implements System, Observer {
 
     @Override
     public void onEvent(EventType eventType, Entity entity) {
-        Log.log("Received event " + eventType + ", " + entity);
+        LOGGER.info("Received event " + eventType + ", " + entity);
         Direction nextDirection = getNextDirection(eventType);
         if (nextDirection != null) {
             List<Entity> bodyParts = componentManager.getBodyComponent().getBodyParts();
@@ -43,7 +46,6 @@ public class DirectionSystem implements System, Observer {
         }
     }
 
-    @Override
     public void update() {
         componentManager.getBodyComponent().getBodyParts().forEach(entity -> {
             DirectionComponent directionComponent = componentManager.getDirectionComponent(entity.getId());

@@ -1,55 +1,56 @@
 package no.taardal.snake.system;
 
 import no.taardal.snake.Game;
-import no.taardal.snake.Log;
 import no.taardal.snake.component.DirectionComponent;
 import no.taardal.snake.component.PositionComponent;
 import no.taardal.snake.component.RouteComponent;
+import no.taardal.snake.component.SpriteComponent;
 import no.taardal.snake.direction.Direction;
 import no.taardal.snake.entity.Entity;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
 import no.taardal.snake.manager.EventManager;
 import no.taardal.snake.observer.Observer;
+import no.taardal.snake.shape.Circle;
 import no.taardal.snake.type.EntityType;
 import no.taardal.snake.type.EventType;
 import no.taardal.snake.vector.Vector2i;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-public class SpawnSystem implements System, Observer {
+public class SpawnSystem implements Observer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpawnSystem.class);
     private static final int MAX_POSSIBLE_SPAWN_LOCATIONS = Game.MAP_SIZE * Game.MAP_SIZE;
 
-    private EntityManager entityManager;
-    private ComponentManager componentManager;
-    private EventManager eventManager;
+    private final EntityManager entityManager;
+    private final ComponentManager componentManager;
+    private final EventManager eventManager;
+
     private Random random;
 
     public SpawnSystem(EntityManager entityManager, ComponentManager componentManager, EventManager eventManager) {
-        this();
         this.entityManager = entityManager;
         this.componentManager = componentManager;
         this.eventManager = eventManager;
-    }
-
-    private SpawnSystem() {
         random = new Random();
     }
 
-    @Override
     public void update() {
 
     }
 
     @Override
     public void onEvent(EventType eventType, Entity entity) {
-        Log.log("Received event " + eventType + ", " + entity);
+        LOGGER.info("Received event " + eventType + ", " + entity);
         if (eventType == EventType.GAME_STARTED) {
             for (int i = 0; i < 3; i++) {
-                Vector2i spawnPosition = new Vector2i(0, i + 1);
+                Vector2i spawnPosition = new Vector2i(0, 10 + i);
                 spawnBodyPart(spawnPosition, Direction.UP);
             }
             spawnApple(new Vector2i(2, 2));
@@ -61,12 +62,13 @@ public class SpawnSystem implements System, Observer {
     }
 
     private void spawnBodyPart(Vector2i spawnPosition, Direction direction) {
-        Entity bodyPartEntity = new Entity(getId(), EntityType.BODY_PART);
-        entityManager.add(bodyPartEntity);
-        componentManager.add(bodyPartEntity.getId(), new DirectionComponent(direction));
-        componentManager.add(bodyPartEntity.getId(), new PositionComponent(spawnPosition));
-        componentManager.add(bodyPartEntity.getId(), new RouteComponent());
-        componentManager.getBodyComponent().addBodyPart(bodyPartEntity);
+        Entity entity = new Entity(getId(), EntityType.BODY_PART);
+        entityManager.add(entity);
+        componentManager.add(entity.getId(), new DirectionComponent(direction));
+        componentManager.add(entity.getId(), new PositionComponent(spawnPosition));
+        componentManager.add(entity.getId(), new RouteComponent());
+        componentManager.add(entity.getId(), new SpriteComponent(new Circle(Game.CELL_SIZE), Color.GREEN));
+        componentManager.getBodyComponent().addBodyPart(entity);
     }
 
     private String getId() {
@@ -77,6 +79,7 @@ public class SpawnSystem implements System, Observer {
         Entity entity = new Entity(getId(), EntityType.APPLE);
         entityManager.add(entity);
         componentManager.add(entity.getId(), new PositionComponent(position));
+        componentManager.add(entity.getId(), new SpriteComponent(new Circle(Game.CELL_SIZE), Color.RED));
     }
 
     private void spawnBodyPartAtEndOfBody() {

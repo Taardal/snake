@@ -8,7 +8,7 @@ import no.taardal.snake.type.EventType;
 
 import java.awt.event.KeyEvent;
 
-public class InputSystem implements System {
+public class InputSystem {
 
     private final EntityManager entityManager;
     private final ComponentManager componentManager;
@@ -22,7 +22,6 @@ public class InputSystem implements System {
         this.keyboard = keyboard;
     }
 
-    @Override
     public void update() {
         if (keyboard.isAnyKeyPressed()) {
             if (keyboard.isPressed(KeyEvent.VK_UP)) {

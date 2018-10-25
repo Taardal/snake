@@ -10,12 +10,14 @@ public class ComponentManager {
     private Map<String, PositionComponent> positionComponents;
     private Map<String, DirectionComponent> directionComponents;
     private Map<String, RouteComponent> routeComponents;
+    private Map<String, SpriteComponent> spriteComponents;
     private BodyComponent bodyComponent;
 
     public ComponentManager() {
         positionComponents = new HashMap<>();
         directionComponents = new HashMap<>();
         routeComponents = new HashMap<>();
+        spriteComponents = new HashMap<>();
         bodyComponent = new BodyComponent();
     }
 
@@ -29,6 +31,10 @@ public class ComponentManager {
 
     public Map<String, RouteComponent> getRouteComponents() {
         return routeComponents;
+    }
+
+    public Map<String, SpriteComponent> getSpriteComponents() {
+        return spriteComponents;
     }
 
     public BodyComponent getBodyComponent() {
@@ -57,5 +63,13 @@ public class ComponentManager {
 
     public void add(String entityId, RouteComponent routeComponent) {
         routeComponents.put(entityId, routeComponent);
+    }
+
+    public SpriteComponent getSpriteComponent(String entityId) {
+        return spriteComponents.get(entityId);
+    }
+
+    public void add(String entityId, SpriteComponent spriteComponent) {
+        spriteComponents.put(entityId, spriteComponent);
     }
 }
