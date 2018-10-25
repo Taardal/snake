@@ -2,6 +2,7 @@ package no.taardal.snake;
 
 import no.taardal.snake.camera.Camera;
 import no.taardal.snake.entity.Entity;
+import no.taardal.snake.gamecanvas.GameCanvas;
 import no.taardal.snake.gameloop.GameLoop;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
-public class Game extends JFrame implements Observer, GameLoop.Listener {
+public class Game extends JFrame implements GameLoop.Listener, Observer {
 
     public static final int MAP_SIZE = 20;
     public static final int CELL_SIZE = 10;

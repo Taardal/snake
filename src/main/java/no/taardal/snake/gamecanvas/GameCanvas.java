@@ -1,4 +1,4 @@
-package no.taardal.snake;
+package no.taardal.snake.gamecanvas;
 
 import no.taardal.snake.camera.Camera;
 import org.slf4j.Logger;
