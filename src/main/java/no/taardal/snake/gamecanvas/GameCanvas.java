@@ -18,7 +18,7 @@ public class GameCanvas extends Canvas {
         setPreferredSize(new Dimension(gameSize * SCALE, gameSize * SCALE));
     }
 
-    public void draw(Camera camera) {
+    public void drawToCanvas(Camera camera) {
         BufferStrategy bufferStrategy = getBufferStrategy();
         if (bufferStrategy == null) {
             createBufferStrategy(NUMBER_OF_BUFFERS);

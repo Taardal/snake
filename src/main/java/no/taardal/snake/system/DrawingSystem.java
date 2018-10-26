@@ -5,18 +5,15 @@ import no.taardal.snake.component.PositionComponent;
 import no.taardal.snake.component.SpriteComponent;
 import no.taardal.snake.manager.ComponentManager;
 import no.taardal.snake.manager.EntityManager;
-import no.taardal.snake.manager.EventManager;
 
 public class DrawingSystem {
 
     private final EntityManager entityManager;
     private final ComponentManager componentManager;
-    private final EventManager eventManager;
 
-    public DrawingSystem(EntityManager entityManager, ComponentManager componentManager, EventManager eventManager) {
+    public DrawingSystem(EntityManager entityManager, ComponentManager componentManager) {
         this.entityManager = entityManager;
         this.componentManager = componentManager;
-        this.eventManager = eventManager;
     }
 
     public void draw(Camera camera) {

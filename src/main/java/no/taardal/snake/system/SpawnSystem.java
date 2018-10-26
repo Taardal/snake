@@ -39,9 +39,9 @@ public class SpawnSystem implements Observer {
     public SpawnSystem(EntityManager entityManager, ComponentManager componentManager, EventManager eventManager) {
         this.entityManager = entityManager;
         this.componentManager = componentManager;
+        random = new Random();
         eventManager.addObserver(this, EventType.GAME_STARTED);
         eventManager.addObserver(this, EventType.APPLE_EATEN);
-        random = new Random();
     }
 
     @Override

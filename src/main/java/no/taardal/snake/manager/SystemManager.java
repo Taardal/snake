@@ -5,12 +5,13 @@ import no.taardal.snake.system.*;
 
 public class SystemManager {
 
-    private final InputSystem inputSystem;
-    private final DirectionSystem directionSystem;
-    private final MovementSystem movementSystem;
-    private final CollisionSystem collisionSystem;
-    private final SpawnSystem spawnSystem;
-    private final DrawingSystem drawingSystem;
+    private InputSystem inputSystem;
+    private DirectionSystem directionSystem;
+    private MovementSystem movementSystem;
+    private CollisionSystem collisionSystem;
+    private SpawnSystem spawnSystem;
+    private DrawingSystem drawingSystem;
+    private ScoreSystem scoreSystem;
 
     public SystemManager(EntityManager entityManager, ComponentManager componentManager, EventManager eventManager) {
         spawnSystem = new SpawnSystem(entityManager, componentManager, eventManager);
@@ -18,9 +19,9 @@ public class SystemManager {
         movementSystem = new MovementSystem(componentManager);
         directionSystem = new DirectionSystem(componentManager, eventManager);
         collisionSystem = new CollisionSystem(entityManager, componentManager, eventManager);
-        drawingSystem = new DrawingSystem(entityManager, componentManager, eventManager);
+        drawingSystem = new DrawingSystem(entityManager, componentManager);
+        scoreSystem = new ScoreSystem(eventManager);
     }
-
 
     public InputSystem getInputSystem() {
         return inputSystem;
@@ -44,6 +45,10 @@ public class SystemManager {
 
     public DrawingSystem getDrawingSystem() {
         return drawingSystem;
+    }
+
+    public ScoreSystem getScoreSystem() {
+        return scoreSystem;
     }
 
     public void update() {
