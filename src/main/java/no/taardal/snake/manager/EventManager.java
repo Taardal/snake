@@ -2,25 +2,26 @@ package no.taardal.snake.manager;
 
 import no.taardal.snake.entity.Entity;
 import no.taardal.snake.observer.Observer;
-import no.taardal.snake.subject.Subject;
 import no.taardal.snake.type.EventType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EventManager {
 
-    private Map<EventType, Subject> subjects;
+    private Map<EventType, List<Observer>> observers;
 
     public EventManager() {
-        subjects = new HashMap<>();
+        observers = new HashMap<>();
     }
 
     public void addObserver(Observer observer, EventType eventType) {
-        if (!subjects.containsKey(eventType)) {
-            subjects.put(eventType, new Subject());
+        if (!observers.containsKey(eventType)) {
+            observers.put(eventType, new ArrayList<>());
         }
-        subjects.get(eventType).add(observer);
+        observers.get(eventType).add(observer);
     }
 
     public void sendEvent(EventType eventType) {
@@ -28,8 +29,8 @@ public class EventManager {
     }
 
     public void sendEvent(EventType eventType, Entity entity) {
-        if (subjects.containsKey(eventType)) {
-            subjects.get(eventType).sendEvent(eventType, entity);
+        if (observers.containsKey(eventType)) {
+            observers.get(eventType).forEach(observer -> observer.onEvent(eventType, entity));
         }
     }
 }

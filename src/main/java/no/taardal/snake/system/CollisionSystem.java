@@ -33,7 +33,7 @@ public class CollisionSystem {
         bodyParts.stream()
                 .filter(entity -> !entity.equals(firstBodyPart) && getPosition(firstBodyPart).equals(getPosition(entity)))
                 .findFirst()
-                .ifPresent(entity -> eventManager.sendEvent(EventType.GAME_ENDED));
+                .ifPresent(entity -> eventManager.sendEvent(EventType.GAME_OVER));
     }
 
     private void sendAppleCollisionEvents(List<Entity> bodyParts) {

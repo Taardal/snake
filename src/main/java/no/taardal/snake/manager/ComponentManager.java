@@ -45,7 +45,7 @@ public class ComponentManager {
         return positionComponents.get(entityId);
     }
 
-    public void add(String entityId, PositionComponent positionComponent) {
+    public void addPositionComponent(String entityId, PositionComponent positionComponent) {
         positionComponents.put(entityId, positionComponent);
     }
 
@@ -53,7 +53,7 @@ public class ComponentManager {
         return directionComponents.get(entityId);
     }
 
-    public void add(String entityId, DirectionComponent directionComponent) {
+    public void addDirectionComponent(String entityId, DirectionComponent directionComponent) {
         directionComponents.put(entityId, directionComponent);
     }
 
@@ -61,7 +61,7 @@ public class ComponentManager {
         return routeComponents.get(entityId);
     }
 
-    public void add(String entityId, RouteComponent routeComponent) {
+    public void addRouteComponent(String entityId, RouteComponent routeComponent) {
         routeComponents.put(entityId, routeComponent);
     }
 
@@ -69,7 +69,7 @@ public class ComponentManager {
         return spriteComponents.get(entityId);
     }
 
-    public void add(String entityId, SpriteComponent spriteComponent) {
+    public void addSpriteComponent(String entityId, SpriteComponent spriteComponent) {
         spriteComponents.put(entityId, spriteComponent);
     }
 }

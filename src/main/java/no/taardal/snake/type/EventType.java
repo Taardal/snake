@@ -1,16 +1,13 @@
 package no.taardal.snake.type;
 
 public enum EventType {
+
     LEFT_PRESSED,
     RIGHT_PRESSED,
     UP_PRESSED,
     DOWN_PRESSED,
     APPLE_EATEN,
-    DIRECTION_CHANGE,
-    KEY_PRESSED,
     GAME_STARTED,
-    EXITED_MAP,
-    COLLIDED_WITH_BODY,
-    GAME_ENDED,
-    DIRECTION_KEY_PRESSED
+    GAME_OVER,
+
 }
