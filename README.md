@@ -1,16 +1,14 @@
 # Snake
 
+<div float="left">
+  <img src="./img/game.gif" width="600" />
+</div>
+
+# Description
+
 Snake game written in Java. 
 
 My first attempt at implementing an [Entity Component System][res:wikipedia:ecs] from scratch as part of learning more about game programming.
-
-# Resources&nbsp;:mortar_board:
-
-- [Game Programming Series: Entity Component System][res:youtube:thecherno:ecs] (YouTube)
-- [Game Programming Patterns: Component][res:gameprogrammingpatterns:component] (Book)
-- [Entity Component System][res:tsprojectsblog:ecs] (Blog)
-- [Entity Systems Wiki][res:entitysystemswiki] (Wiki)
-- [Understanding Entity Component System][res:gamedev:understanding-ecs] (Forum)
 
 # Prerequisites&nbsp;:vertical_traffic_light:
 
@@ -36,11 +34,13 @@ My first attempt at implementing an [Entity Component System][res:wikipedia:ecs]
 - Build the app: `mvn clean package`
 - Run the app: `java -jar target/snake-jar-with-dependencies.jar`
 
-<br>
-<div float="left">
-  <img src="./img/game.png" width="400" />
-  <img src="./img/game_over.png" width="400" />
-</div>
+# Resources&nbsp;:books:
+
+- [Game Programming Series: Entity Component System][res:youtube:thecherno:ecs] (YouTube)
+- [Game Programming Patterns: Component][res:gameprogrammingpatterns:component] (Book)
+- [Entity Component System][res:tsprojectsblog:ecs] (Blog)
+- [Entity Systems Wiki][res:entitysystemswiki] (Wiki)
+- [Understanding Entity Component System][res:gamedev:understanding-ecs] (Forum)
 
 
 [git:download]: https://git-scm.com/downloads
